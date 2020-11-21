@@ -7,3 +7,4 @@ VALUES
 {% if num+1 < value|length%},{% endif %}
 {% endfor %}
 {% endfor %}
+;

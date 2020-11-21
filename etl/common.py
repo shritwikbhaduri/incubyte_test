@@ -7,7 +7,7 @@ import pandas as pd
 import datetime as dt
 import arrow
 
-from etl.db import connect_db
+from etl.db import DBManager
 
 
 def convert_date_format(date: str, format: str) -> dt.datetime:
@@ -68,6 +68,9 @@ def load_tables(table_dict: Dict, detail_record_layout: str):
     :param table_dict:
     :return:
     """
+    db = DBManager()
+    db.connect_db()
+
     layout_df = pd.read_csv(path.join(path.dirname(path.abspath(__file__)),
                                       f"../config/detail_record_format/{detail_record_layout}"))
 
@@ -76,11 +79,13 @@ def load_tables(table_dict: Dict, detail_record_layout: str):
                                        country_list=table_dict.keys(), **layout_df.to_dict())
 
     click.echo("\n***create table queries***")
-    click.echo(create_sql_query)
+    click.echo(create_sql_query.strip())
 
     add_row_query = render_template(path.join(path.dirname(path.abspath(__file__)),
                                               "../templates/add_rows_to_tables.sql"), **table_dict)
     click.echo("\n***insert into queries***")
-    click.echo(add_row_query)
+    click.echo(add_row_query.strip())
 
-    cursor = connect_db()
+    db.execute(query=create_sql_query, multi=True)
+    db.execute(query=add_row_query, multi=True)
+    db.close_connection()
