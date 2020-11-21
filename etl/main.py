@@ -38,7 +38,7 @@ def main(detail_record: str, file: str, persist):
 
     intermediate_Table: DataFrame = extract_file(**configuration)
 
-    final_tables: Dict[str, DataFrame] = transform_tables(intermediate_Table)
+    final_tables: Dict[str, DataFrame] = transform_tables(df=intermediate_Table, configurations=configuration)
 
     if persist:
         load_tables(final_tables, configuration["detailrecordlayout"])
