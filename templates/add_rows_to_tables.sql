@@ -1,5 +1,5 @@
 {% for key, value in values.items() %}
-INSERT INTO {{key}}
+INSERT INTO table_{{key}}
 ({{value[1].keys()|join(", ")}})
 VALUES
 {% for num in range(0,value|length) %}
