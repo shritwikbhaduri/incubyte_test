@@ -1,7 +1,7 @@
 from os import path
 
 import click
-from mysql.connector import ClientFlag, errorcode
+from mysql.connector import ClientFlag
 from environment import get_settings
 
 import mysql.connector
@@ -39,7 +39,9 @@ class DBManager:
                 client_flags=[ClientFlag.SSL],
                 ssl_ca=self.ssl_ca,
                 ssl_cert=self.ssl_cert,
-                ssl_key=self.ssl_key
+                ssl_key=self.ssl_key,
+                autocommit=True,
+                consume_results=True
             )
             self.cursor = self.db.cursor()
         except mysql.connector.Error as err:
@@ -49,16 +51,15 @@ class DBManager:
     def execute(self, query: str, **kwargs):
         try:
             result = self.cursor.execute(query, **kwargs)
-            click.echo("successfully executed all queries")
-            return result
+            click.echo(f"successfully executed all queries(rows effected: {self.cursor.rowcount})")
         except mysql.connector.Error as err:
             print(f"Failed to execute self({err})")
 
     def fetch_all(self, query: str):
         try:
-            result = self.cursor.fetch_all(query)
+            self.cursor.fetch_all(query)
             click.echo("successfully fetched all rows")
-            return result
+            return self.cursor.fetch_all()
         except mysql.connector.Error as err:
             click.echo(f"Failed to fetch data({err})")
 

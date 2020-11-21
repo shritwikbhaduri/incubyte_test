@@ -22,7 +22,7 @@ def convert_date_format(df: pd.DataFrame, date_column: Dict, _format: str) -> pd
     """
     for column in date_column.keys():
         df[column] = df.transform(
-            lambda row: arrow.get(str(row[column]) if len(str(row[column])) == 8 else ("0"+str(row[column])),
+            lambda row: arrow.get(str(row[column]) if len(str(row[column])) == 8 else ("0" + str(row[column])),
                                   date_column[column]).format(_format),
             axis=1
         )
@@ -78,7 +78,6 @@ def transform_tables(df: pd.DataFrame, configurations: Dict) -> Dict[str, pd.Dat
     # transforming dates according to the database requirements
     date_column: Dict = ast.literal_eval(configurations["datecolumn"])
     convert_date_format(df=df, date_column=date_column, _format=configurations["datetimeformat"])
-
 
     final_dict: Dict = {}
     [final_dict.update({element: df[df['Country'] == element].to_dict('records')}) for element in country_list]
