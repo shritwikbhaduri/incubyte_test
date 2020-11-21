@@ -7,6 +7,8 @@ import pandas as pd
 import datetime as dt
 import arrow
 
+from etl.db import connect_db
+
 
 def convert_date_format(date: str, format: str) -> dt.datetime:
     """
@@ -41,6 +43,7 @@ def extract_file(file_path: str, headerrecordlayout: str, **kwargs) -> pd.DataFr
     df: pd.DataFrame = pd.read_csv(file_path, sep="|")
     required_column = headerrecordlayout.split('|')[2:]
     df.drop(df.columns.difference(required_column), 1, inplace=True)
+    click.echo()
 
     return df
 
@@ -49,7 +52,7 @@ def transform_tables(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     """
     this function returns a list of dataframes depending on the country
     :param df: dataframe that needs to be manipulated
-    :return: dataframe
+    :return: dictionary of dataframe
     """
     click.echo("splitting the dataframe into separated dataframes bases on the Country Column")
     country_list: List = df.Country.unique()
@@ -58,12 +61,12 @@ def transform_tables(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     return final_dict
 
 
-def load_tables(table_dict: Dict, detail_record_layout: str) -> Dict:
+def load_tables(table_dict: Dict, detail_record_layout: str):
     """
     accept dict of dataframe and loads in to database
     :param detail_record_layout:
     :param table_dict:
-    :return: status message
+    :return:
     """
     layout_df = pd.read_csv(path.join(path.dirname(path.abspath(__file__)),
                                       f"../config/detail_record_format/{detail_record_layout}"))
@@ -79,3 +82,5 @@ def load_tables(table_dict: Dict, detail_record_layout: str) -> Dict:
                                               "../templates/add_rows_to_tables.sql"), **table_dict)
     click.echo("\n***insert into queries***")
     click.echo(add_row_query)
+
+    cursor = connect_db()

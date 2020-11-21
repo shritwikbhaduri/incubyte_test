@@ -12,7 +12,7 @@ from os import path
 @click.command()
 @click.option('--detail-record',
               default='default', help='name of record detail file required for the etl process')
-@click.option('--file', default='demo_file.txt', help='path of the data file')
+@click.option('--file', default='demo_file.txt', help='name of the data file')
 @click.option('--persist', default=False, is_flag=True, help='if set to true, changes will be applied to database')
 def main(detail_record: str, file: str, persist):
 
